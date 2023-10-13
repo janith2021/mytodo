@@ -1,3 +1,7 @@
+// import 'dart:js_interop';
+
+// import 'dart:js_interop';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_holo_date_picker/date_picker.dart';
 import 'package:mytodo/constants/allDimensions.dart';
@@ -39,7 +43,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<List<Task>> gettasks() async {
     var data = await DatabaseHelper.instance.getdata();
-    debugPrint(data.toString());
+    // debugPrint(data.toString());
     for (var dat in data) {
       var id = dat['id'].toString();
       var title = dat['title'].toString();
@@ -47,13 +51,15 @@ class _HomePageState extends State<HomePage> {
       var taskdate = dat['taskdate'].toString();
       var tasktime = dat['tasktime'].toString();
       // debugPrint(id);
-      // var taskpriority = dat['taskpriority'].toString();
-      Task task = Task(id, title, description, tasktime, taskdate);
-      // debugPrint(task.toString());
+      var taskpriority = dat['taskpriority'];
+      debugPrint(taskpriority.toString());
+      Task task =
+          Task(id, title, description, tasktime, taskdate, taskpriority);
+      // debugPrint(task.taskpriority.toString());
       tasks.add(task);
       // debugPrint(id.toString());
     }
-    debugPrint(tasks.toString());
+    // debugPrint(tasks[0].toString());
     return tasks;
   }
 
@@ -75,7 +81,7 @@ class _HomePageState extends State<HomePage> {
         ),
         floatingActionButton: FloatingActionButton(
             onPressed: () {
-              createtaskpopup(context);
+              createtaskpopup(context, null);
             },
             child: const Icon(Icons.add),
             tooltip: "Add Your New Task"),
@@ -89,33 +95,44 @@ class _HomePageState extends State<HomePage> {
                   return Expanded(child: Text(snapshot.error.toString()));
                 }
                 var data = snapshot.data;
+                // debugPrint(data?[0].toString());
                 return ListView.builder(
                     itemCount: data!.length,
                     itemBuilder: (context, index) {
                       var item = data[index];
-                      // debugPrint(item.toString());
+                      debugPrint(item.taskpriority.toString());
                       return Padding(
-                        padding: const EdgeInsets.only(top: 10,left: 10,right: 10),
+                        padding:
+                            const EdgeInsets.only(top: 10, left: 10, right: 10),
                         child: Container(
-                          decoration: BoxDecoration(color: Colors.cyan,boxShadow: [BoxShadow(blurRadius: 5)]),
+                          decoration: BoxDecoration(
+                              color: Colors.cyan,
+                              boxShadow: [BoxShadow(blurRadius: 5)]),
                           padding: EdgeInsets.all(AllDimensions.px10),
                           child: Column(
                             children: [
-                              Row(mainAxisAlignment: MainAxisAlignment.end,children: [
-                                InkWell(onTap: (){
-                                  
-                                },child: Icon(Icons.edit)),
-                                Icon(Icons.delete)
-                              ],),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  InkWell(
+                                      onTap: () {
+                                        debugPrint("Hi");
+                                        createtaskpopup(context, item);
+                                      },
+                                      child: Icon(Icons.edit)),
+                                  Icon(Icons.delete)
+                                ],
+                              ),
                               Text(item.title),
                               Text(item.description),
                               Text(item.taskdate),
                               Text(item.tasktime),
-                              SizedBox(height: AllDimensions.px10,)
+                              Text(item.taskpriority.toString()),
+                              SizedBox(
+                                height: AllDimensions.px10,
+                              )
                             ],
                           ),
-                         
-                                             
                         ),
                       );
                     });
@@ -125,125 +142,128 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-Future<dynamic> createtaskpopup(BuildContext context) {
+  Future<dynamic> createtaskpopup(BuildContext context, Task? item) {
+    debugPrint(item!.taskpriority.toString());
     return showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return Consumer<CreateTaskProvider>(
-                      builder: (context, provider, _) {
-                    return AlertDialog(
-                        shadowColor: Colors.amber,
-                        backgroundColor: Colors.amber,
-                        title: const Center(child: Text("TASK")),
-                        // scrollable: false,
-                        // insetPadding: EdgeInsets.symmetric(vertical: AllDimensions.px10),
-                        actions: [
-                          ElevatedButton(
-                              onPressed: () {
-                                provider.createTask(context);
-                              },
-                              child: const Text(
-                                "Create Task",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ))
-                        ],
-                        content: SingleChildScrollView(
-                          child: Column(
-                            // mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Text("Title: ${provider.selected}"),
-                              TextFormField(
-                                controller: provider.controllertasktitle,
-                                decoration: InputDecoration(
-                                    hintText: "Enter The Title",
-                                    label: Text("Title: ")),
-                              ),
-                              TextFormField(
-                                controller:
-                                    provider.controllertaskdescription,
-                                decoration: InputDecoration(
-                                    hintText: "Enter The Description",
-                                    label: Text("Description: ")),
-                              ),
-                              TextFormField(
-                                onTap: () async {
-                                  DateTime? pickeddatetime =
-                                      await showOmniDateTimePicker(
-                                    context: context,
-                                    initialDate: DateTime.now(),
-                                    firstDate: DateTime.now(),
-                                    is24HourMode: false,
-                                    isShowSeconds: false,
-                                    isForce2Digits: false,
-                                    minutesInterval: 1,
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(16)),
-                                    constraints: const BoxConstraints(
-                                      maxWidth: 350,
-                                      maxHeight: 650,
-                                    ),
-                                    transitionBuilder:
-                                        (context, anim1, anim2, child) {
-                                      return FadeTransition(
-                                        opacity: anim1.drive(
-                                          Tween(
-                                            begin: 0,
-                                            end: 1,
-                                          ),
-                                        ),
-                                        child: child,
-                                      );
-                                    },
-                                    transitionDuration:
-                                        const Duration(milliseconds: 200),
-                                    barrierDismissible: true,
-                                  );
-                                  var newdatetime = pickeddatetime.toString();
-                                  var splitting = newdatetime.split(" ");
-                                  splitting[1] =
-                                      splitting[1].replaceAll(":00.000", "");
-                                  provider.controllertaskdate.text =
-                                      splitting[0];
-                                  provider.controllertasktime.text =
-                                      splitting[1];
-                                  // debugPrint(splitting[1]);
-                                },
-                                //  debugPrint(dateTime.toString());
-                                controller: provider.controllertaskdate,
-                                decoration: const InputDecoration(
-                                    hintText: "Pick The Task Date",
-                                    label: Text("Task Date"),
-                                    suffixIcon: Icon(
-                                        Icons.calendar_view_day_rounded)),
-                              ),
-                              TextFormField(
-                                readOnly: true,
-                                controller: provider.controllertasktime,
-                                decoration: const InputDecoration(
-                                    label: Text("Task Time"),
-                                    hintText: "Your Task Time"),
-                              ),
-                              SizedBox(
-                                height: AllDimensions.px10,
-                              ),
-                              const Text("Select Your Task Priority"),
-                              DropdownButton(
-                                dropdownColor: Colors.amber,
-                                items: items,
-                                // dropdownColor: Colors.blue,
-                                // elevation: 1,
+        context: context,
+        builder: (BuildContext context) {
+          return Consumer<CreateTaskProvider>(builder: (context, provider, _) {
+            // debugPrint(item!.description);
+            item == null
+                ? ""
+                : (
+                    provider.controllertasktitle.text = item.title,
+                    provider.controllertaskdescription.text = item.description,
+                    provider.controllertasktime.text = item.tasktime,
+                    provider.controllertaskdate.text = item.taskdate
+                  );
+            return AlertDialog(
+                shadowColor: Colors.amber,
+                backgroundColor: Colors.amber,
+                title: const Center(child: Text("TASK")),
+                // scrollable: false,
+                // insetPadding: EdgeInsets.symmetric(vertical: AllDimensions.px10),
+                actions: [
+                  ElevatedButton(
+                      onPressed: () {
+                        provider.createTask(context);
+                      },
+                      child: Text(
+                        item == null ? "Create Task" : "Update Task",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ))
+                ],
+                content: SingleChildScrollView(
+                  child: Column(
+                    // mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Text("Title: ${provider.selected}"),
+                      TextFormField(
+                        controller: provider.controllertasktitle,
+                        decoration: InputDecoration(
+                            hintText: "Enter The Title",
+                            label: Text("Title: ")),
+                      ),
+                      TextFormField(
+                        controller: provider.controllertaskdescription,
+                        decoration: InputDecoration(
+                            hintText: "Enter The Description",
+                            label: Text("Description: ")),
+                      ),
+                      TextFormField(
+                        onTap: () async {
+                          DateTime? pickeddatetime =
+                              await showOmniDateTimePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime.now(),
+                            is24HourMode: false,
+                            isShowSeconds: false,
+                            isForce2Digits: false,
+                            minutesInterval: 1,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(16)),
+                            constraints: const BoxConstraints(
+                              maxWidth: 350,
+                              maxHeight: 650,
+                            ),
+                            transitionBuilder: (context, anim1, anim2, child) {
+                              return FadeTransition(
+                                opacity: anim1.drive(
+                                  Tween(
+                                    begin: 0,
+                                    end: 1,
+                                  ),
+                                ),
+                                child: child,
+                              );
+                            },
+                            transitionDuration:
+                                const Duration(milliseconds: 200),
+                            barrierDismissible: true,
+                          );
+                          var newdatetime = pickeddatetime.toString();
+                          var splitting = newdatetime.split(" ");
+                          splitting[1] = splitting[1].replaceAll(":00.000", "");
+                          provider.controllertaskdate.text = splitting[0];
+                          provider.controllertasktime.text = splitting[1];
+                          // debugPrint(splitting[1]);
+                        },
+                        //  debugPrint(dateTime.toString());
+                        controller: provider.controllertaskdate,
+                        decoration: const InputDecoration(
+                            hintText: "Pick The Task Date",
+                            label: Text("Task Date"),
+                            suffixIcon: Icon(Icons.calendar_view_day_rounded)),
+                      ),
+                      TextFormField(
+                        readOnly: true,
+                        controller: provider.controllertasktime,
+                        decoration: const InputDecoration(
+                            label: Text("Task Time"),
+                            hintText: "Your Task Time"),
+                      ),
+                      SizedBox(
+                        height: AllDimensions.px10,
+                      ),
+                      const Text("Select Your Task Priority"),
+                      DropdownButton(
+                        dropdownColor: Colors.amber,
+                        items: items,
+                        // dropdownColor: Colors.blue,
+                        // elevation: 1,
 
-                                onChanged: (String? changedvalue) {
-                                  provider.selected = changedvalue!;
-                                  provider.checkupdate();
-                                },
-                                value: provider.selected,
-                                isExpanded: true,
-                              ),
-                            ],
-                          ),
-                        ));
-                  });
-                });
+                        onChanged: (String? changedvalue) {
+                          provider.selected = changedvalue!;
+                          provider.checkupdate();
+                        },
+                        value: provider.selected,
+                        isExpanded: true,
+                      ),
+                    ],
+                  ),
+                ));
+          });
+        });
   }
 }
