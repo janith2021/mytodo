@@ -11,6 +11,7 @@ class CreateTaskProvider extends ChangeNotifier {
   TextEditingController controllertaskpriority = TextEditingController();
 
   String selected = "1";
+
   checkupdate() {
     notifyListeners();
   }
@@ -27,8 +28,12 @@ class CreateTaskProvider extends ChangeNotifier {
     if (!i.isNaN) {
       // ignore: use_build_context_synchronously
       // Navigator.pop(context);
+      notifyListeners();
       // ignore: use_build_context_synchronously
-      Navigator.popAndPushNamed(context, "/tasks/dashboard");
+      Navigator.pop(context);
+
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacementNamed(context, "/tasks/dashboard");
       // ignore: use_build_context_synchronously
       ArtSweetAlert.show(
           context: context,
@@ -36,7 +41,14 @@ class CreateTaskProvider extends ChangeNotifier {
               title: 'Success',
               text: 'Task Created Successfully',
               type: ArtSweetAlertType.success));
+
+      // return true;
     } else {
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context);
+
+      // ignore: use_build_context_synchronously
+      Navigator.pushReplacementNamed(context, "/tasks/dashboard");
       // ignore: use_build_context_synchronously
       ArtSweetAlert.show(
           context: context,
@@ -45,6 +57,36 @@ class CreateTaskProvider extends ChangeNotifier {
             text: "Task Creation Failed",
             type: ArtSweetAlertType.danger,
           ));
+      // return false;
     }
+  }
+
+  updatetask(BuildContext context, id) async {
+    var data = await DatabaseHelper.instance.updatedata(
+        controllertaskdate.text,
+        controllertasktime.text,
+        controllertasktitle.text,
+        controllertaskdescription.text,
+        controllertaskpriority.text,
+        id);
+    // ignore: use_build_context_synchronously
+    Navigator.pop(context);
+    Navigator.pushReplacementNamed(context, "/tasks/dashboard");
+    // debugPrint(data.toString());
+  }
+
+  deletetask(BuildContext context, id) async {
+    debugPrint("Hello");
+    var data = await DatabaseHelper.instance.deletedata(id);
+    debugPrint(data.toString());
+    // ignore: use_build_context_synchronously
+    // Navigator.pop(context);
+    // ignore: use_build_context_synchronously
+    // ignore: use_build_context_synchronously
+    // Navigator.pop(context);
+
+    // ignore: use_build_context_synchronously
+    Navigator.pushReplacementNamed(context, "/tasks/dashboard");
+    // notifyListeners();
   }
 }

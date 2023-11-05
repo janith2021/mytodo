@@ -58,4 +58,22 @@ class DatabaseHelper {
     Database db = await instance.database;
     return await db.query(table1name);
   }
+
+  Future<int> deletedata(String id) async {
+    Database db = await instance.database;
+
+    int count =
+        await db.rawDelete('DELETE FROM tasks WHERE $table1id = ?', [id]);
+    return count;
+  }
+
+  Future<int> cleardatabase() async {
+    Database db = await instance.database;
+    return await db.delete('tasks', where: '$table1id = ?');
+  }
+
+  Future<int> updatedata(String date, String time, String title, String description, String priority, String id) async {
+    Database db = await instance.database;
+    return await db.rawUpdate('UPDATE tasks SET $table1taskdate = ? , $table1tasktime = ? , $table1title = ? , $table1description = ? , $table1taskpriority = ? WHERE $table1id = ?',[date,time,title,description,priority,id]);
+  }
 }

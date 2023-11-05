@@ -6,5 +6,6 @@ class Task {
   final String taskdate;
   final int taskpriority;
 
-  Task(this.id, this.title, this.description, this.tasktime, this.taskdate, this.taskpriority);
+  Task(this.id, this.title, this.description, this.tasktime, this.taskdate,
+      this.taskpriority);
 }

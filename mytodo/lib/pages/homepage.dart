@@ -2,8 +2,10 @@
 
 // import 'dart:js_interop';
 
+import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_holo_date_picker/date_picker.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mytodo/constants/allDimensions.dart';
 import 'package:mytodo/constants/allStrings.dart';
 import 'package:mytodo/constants/appColors.dart';
@@ -42,6 +44,7 @@ class _HomePageState extends State<HomePage> {
   TextEditingController controllertitle = TextEditingController();
 
   Future<List<Task>> gettasks() async {
+    tasks.clear();
     var data = await DatabaseHelper.instance.getdata();
     // debugPrint(data.toString());
     for (var dat in data) {
@@ -52,12 +55,12 @@ class _HomePageState extends State<HomePage> {
       var tasktime = dat['tasktime'].toString();
       // debugPrint(id);
       var taskpriority = dat['taskpriority'];
-      debugPrint(taskpriority.toString());
+      debugPrint(title.toString());
       Task task =
           Task(id, title, description, tasktime, taskdate, taskpriority);
       // debugPrint(task.taskpriority.toString());
       tasks.add(task);
-      // debugPrint(id.toString());
+      debugPrint(id.toString());
     }
     // debugPrint(tasks[0].toString());
     return tasks;
@@ -67,7 +70,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.amber[50],
+        backgroundColor: Colors.white,
         appBar: AppBar(
           leading: null,
           automaticallyImplyLeading: false,
@@ -89,51 +92,109 @@ class _HomePageState extends State<HomePage> {
             future: gettasks(),
             builder: (context, AsyncSnapshot<List<Task>> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
+                return const CircularProgressIndicator();
               } else {
                 if (snapshot.hasError) {
                   return Expanded(child: Text(snapshot.error.toString()));
                 }
                 var data = snapshot.data;
-                // debugPrint(data?[0].toString());
+                if (data!.isEmpty) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Image.network(
+                      //     "https://img.freepik.com/free-vector/no-data-concept-illustration_114360-2506.jpg?w=996&t=st=1699148422~exp=1699149022~hmac=d98cb67209ac5af4f2f67366dd0a2576827146d354b95926c21d090a3ada73dd"),
+                      Image.asset("Assets/homepage/notfound.jpg"),
+                      Text(
+                        "No Tasks Found",
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+                        // textAlign: TextAlign.center,
+                      ),
+                    ],
+                  );
+                }
+                // return Text('Hello');
+                // debugPrint(data[0].toString());
                 return ListView.builder(
-                    itemCount: data!.length,
+                    itemCount: data.length,
                     itemBuilder: (context, index) {
                       var item = data[index];
-                      debugPrint(item.taskpriority.toString());
+                      // debugPrint(item.taskpriority.toString());
                       return Padding(
                         padding:
                             const EdgeInsets.only(top: 10, left: 10, right: 10),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.cyan,
-                              boxShadow: [BoxShadow(blurRadius: 5)]),
-                          padding: EdgeInsets.all(AllDimensions.px10),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  InkWell(
-                                      onTap: () {
-                                        debugPrint("Hi");
-                                        createtaskpopup(context, item);
+                        child: Consumer<CreateTaskProvider>(
+                            builder: (context, provider, _) {
+                          return Container(
+                            decoration: const BoxDecoration(
+                                color: Colors.cyan,
+                                boxShadow: [BoxShadow(blurRadius: 5)]),
+                            padding: EdgeInsets.all(AllDimensions.px10),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    IconButton(
+                                        onPressed: () {
+                                          createtaskpopup(context, item);
+                                        },
+                                        icon: const Icon(Icons.edit)),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete),
+                                      onPressed: () async {
+                                        // debugPrint("Hi");
+                                        ArtDialogResponse res =
+                                            await ArtSweetAlert.show(
+                                                context: context,
+                                                artDialogArgs: ArtDialogArgs(
+                                                  title: "Delete",
+                                                  text:
+                                                      "Are You Sure You want to Delete this Task?",
+                                                  type: ArtSweetAlertType
+                                                      .question,
+                                                  showCancelBtn: true,
+                                                  confirmButtonText: "Delete",
+                                                  confirmButtonColor:
+                                                      Colors.red,
+                                                  cancelButtonColor:
+                                                      Colors.green,
+                                                ));
+                                        // if (res == null) {
+                                        //   return;
+                                        // }
+                                        if (res.isTapConfirmButton) {
+                                          // provider
+                                          // debugPrint("Hello");
+                                          // ignore: use_build_context_synchronously
+                                          provider.deletetask(context, item.id);
+                                          // ignore: use_build_context_synchronously
+
+                                          // setState(() {
+
+                                          // });
+                                          // gettasks();
+
+                                          return;
+                                        }
+                                        // Icon(Icons.edit);
                                       },
-                                      child: Icon(Icons.edit)),
-                                  Icon(Icons.delete)
-                                ],
-                              ),
-                              Text(item.title),
-                              Text(item.description),
-                              Text(item.taskdate),
-                              Text(item.tasktime),
-                              Text(item.taskpriority.toString()),
-                              SizedBox(
-                                height: AllDimensions.px10,
-                              )
-                            ],
-                          ),
-                        ),
+                                    ),
+                                  ],
+                                ),
+                                Text(item.title),
+                                Text(item.description),
+                                Text(item.taskdate),
+                                Text(item.tasktime),
+                                Text(item.taskpriority.toString()),
+                                SizedBox(
+                                  height: AllDimensions.px10,
+                                )
+                              ],
+                            ),
+                          );
+                        }),
                       );
                     });
               }
@@ -143,14 +204,20 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<dynamic> createtaskpopup(BuildContext context, Task? item) {
-    debugPrint(item!.taskpriority.toString());
+    // debugPrint(item!.taskpriority.toString());
     return showDialog(
         context: context,
         builder: (BuildContext context) {
           return Consumer<CreateTaskProvider>(builder: (context, provider, _) {
             // debugPrint(item!.description);
             item == null
-                ? ""
+                ? (
+                    provider.controllertaskdate.text = "",
+                    provider.controllertaskdescription.text = "",
+                    provider.controllertaskpriority.text = "",
+                    provider.controllertasktime.text = "",
+                    provider.controllertasktitle.text = "",
+                  )
                 : (
                     provider.controllertasktitle.text = item.title,
                     provider.controllertaskdescription.text = item.description,
@@ -166,11 +233,18 @@ class _HomePageState extends State<HomePage> {
                 actions: [
                   ElevatedButton(
                       onPressed: () {
-                        provider.createTask(context);
+                        // debugPrint("Task Created");
+                        if (item == null) {
+                          provider.createTask(context);
+                        }
+                        // else {
+                        //   debugPrint("Hello");
+                        //   provider.updatetask(context, item.id);
+                        // }
                       },
                       child: Text(
                         item == null ? "Create Task" : "Update Task",
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ))
                 ],
                 content: SingleChildScrollView(
@@ -180,13 +254,13 @@ class _HomePageState extends State<HomePage> {
                       // Text("Title: ${provider.selected}"),
                       TextFormField(
                         controller: provider.controllertasktitle,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                             hintText: "Enter The Title",
                             label: Text("Title: ")),
                       ),
                       TextFormField(
                         controller: provider.controllertaskdescription,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                             hintText: "Enter The Description",
                             label: Text("Description: ")),
                       ),
