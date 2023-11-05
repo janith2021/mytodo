@@ -2,6 +2,8 @@
 
 // import 'dart:js_interop';
 
+// import 'dart:js_interop';
+
 import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_holo_date_picker/date_picker.dart';
@@ -140,9 +142,9 @@ class _HomePageState extends State<HomePage> {
                                         onPressed: () {
                                           createtaskpopup(context, item);
                                         },
-                                        icon: const Icon(Icons.edit)),
+                                        icon: const Icon(Icons.edit),color: Colors.red,),
                                     IconButton(
-                                      icon: const Icon(Icons.delete),
+                                      icon: const Icon(Icons.delete,color: Colors.red,),
                                       onPressed: () async {
                                         // debugPrint("Hi");
                                         ArtDialogResponse res =
@@ -183,11 +185,56 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ],
                                 ),
-                                Text(item.title),
-                                Text(item.description),
-                                Text(item.taskdate),
-                                Text(item.tasktime),
-                                Text(item.taskpriority.toString()),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 100),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text("Task Name:- ",style: GoogleFonts.poppins(fontWeight: FontWeight.bold),),
+                                      Text(item.title,style: GoogleFonts.poppins(fontWeight: FontWeight.bold),),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 100),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text("Task Description:- ",style: GoogleFonts.poppins(fontWeight: FontWeight.bold),),
+                                      Text(item.description,style: GoogleFonts.poppins(fontWeight: FontWeight.bold),),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 100),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text("Task Date :- ",style: GoogleFonts.poppins(fontWeight: FontWeight.bold),),
+                                      Text(item.taskdate,style: GoogleFonts.poppins(fontWeight: FontWeight.bold),),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 100),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text("Task Time:- ",style: GoogleFonts.poppins(fontWeight: FontWeight.bold),),
+                                      Text(item.tasktime,style: GoogleFonts.poppins(fontWeight: FontWeight.bold),),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 100),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text("Task Priority:- ",style: GoogleFonts.poppins(fontWeight: FontWeight.bold),),
+                                      Text(item.taskpriority.toString(),style: GoogleFonts.poppins(fontWeight: FontWeight.bold),),
+                                    ],
+                                  ),
+                                ),
                                 SizedBox(
                                   height: AllDimensions.px10,
                                 )
@@ -211,13 +258,7 @@ class _HomePageState extends State<HomePage> {
           return Consumer<CreateTaskProvider>(builder: (context, provider, _) {
             // debugPrint(item!.description);
             item == null
-                ? (
-                    provider.controllertaskdate.text = "",
-                    provider.controllertaskdescription.text = "",
-                    provider.controllertaskpriority.text = "",
-                    provider.controllertasktime.text = "",
-                    provider.controllertasktitle.text = "",
-                  )
+                ? ""
                 : (
                     provider.controllertasktitle.text = item.title,
                     provider.controllertaskdescription.text = item.description,
@@ -234,9 +275,16 @@ class _HomePageState extends State<HomePage> {
                   ElevatedButton(
                       onPressed: () {
                         // debugPrint("Task Created");
-                        if (item == null) {
-                          provider.createTask(context);
-                        }
+                        // if (item == null) {
+                        //   debugPrint(item.toString());
+                        //   provider.createTask(context);
+                        //   return;
+                        // }
+                        item == null ? provider.createTask(context)  : provider.updatetask(context,item.id);
+                        // debugPrint(item.toString());
+                        // if (item != null) {
+                        //   provider.updatetask(item.id, context);
+                        // }
                         // else {
                         //   debugPrint("Hello");
                         //   provider.updatetask(context, item.id);

@@ -62,15 +62,19 @@ class CreateTaskProvider extends ChangeNotifier {
   }
 
   updatetask(BuildContext context, id) async {
-    var data = await DatabaseHelper.instance.updatedata(
+    int i = await DatabaseHelper.instance.updatedata(
         controllertaskdate.text,
         controllertasktime.text,
         controllertasktitle.text,
         controllertaskdescription.text,
-        controllertaskpriority.text,
         id);
+    // debugPrint(id);
+    // debugPrint(i.toString());
+    // // ignore: use_build_context_synchronously
     // ignore: use_build_context_synchronously
     Navigator.pop(context);
+    // // ignore: use_build_context_synchronously
+    // ignore: use_build_context_synchronously
     Navigator.pushReplacementNamed(context, "/tasks/dashboard");
     // debugPrint(data.toString());
   }

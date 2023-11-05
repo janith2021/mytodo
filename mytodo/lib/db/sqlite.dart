@@ -72,8 +72,17 @@ class DatabaseHelper {
     return await db.delete('tasks', where: '$table1id = ?');
   }
 
-  Future<int> updatedata(String date, String time, String title, String description, String priority, String id) async {
+  Future<int> updatedata(String date, String time, String title,
+      String description, String id) async {
+    debugPrint(date);
+    debugPrint(time);
+    debugPrint(title);
+    debugPrint(description);
+    // debugPrint(priority);
+    debugPrint(id);
     Database db = await instance.database;
-    return await db.rawUpdate('UPDATE tasks SET $table1taskdate = ? , $table1tasktime = ? , $table1title = ? , $table1description = ? , $table1taskpriority = ? WHERE $table1id = ?',[date,time,title,description,priority,id]);
+    return await db.rawUpdate(
+        'UPDATE tasks SET $table1taskdate = ? , $table1tasktime = ? , $table1title = ? , $table1description = ? WHERE $table1id = ?',
+        [date, time, title, description,id]);
   }
 }
