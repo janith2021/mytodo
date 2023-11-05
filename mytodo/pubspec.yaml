@@ -44,10 +44,39 @@ dependencies:
   sqflite: ^2.3.0
   path_provider: ^2.1.1
   art_sweetalert: ^0.0.5
+  icons_launcher: ^2.1.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+icons_launcher:
+  image_path: "Assets/appicon/todo.jpg"
+  platforms:
+    android:
+      enable: true
+      image_path: "Assets/appicon/todo.jpg"
+      # adaptive_background_color: '#ffffff'
+      adaptive_background_image: "Assets/appicon/todo.jpg"
+      adaptive_foreground_image: "Assets/appicon/todo.jpg"
+      adaptive_round_image: "Assets/appicon/todo.jpg"
+      adaptive_monochrome_image: "Assets/appicon/todo.jpg"
+    ios:
+      enable: true
+      image_path: "Assets/appicon/todo.jpg"
+    web:
+      enable: true
+      image_path: "Assets/appicon/todo.jpg"
+      favicon_path: "Assets/appicon/todo.jpg"
+    macos:
+      enable: false
+      image_path: "Assets/appicon/todo.jpg"
+    windows:
+      enable: false
+      image_path: "Assets/appicon/todo.jpg"
+    linux:
+      enable: false
+      image_path: "Assets/appicon/todo.jpg"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -70,6 +99,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - Assets/homepage/
+    - Assets/appicon/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
